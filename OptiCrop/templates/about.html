@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — OptiCrop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  {% include "_nav.html" %}
+
+  <section class="section" style="padding-top:56px;">
+    <div class="container">
+      <div class="about-hero">
+        <div class="about-hero__copy">
+          <div class="section__eyebrow">About the project</div>
+          <h2>A field notebook, automated</h2>
+          <p class="dek">
+            OptiCrop is a Machine Learning-based web application that turns soil and
+            climate readings — Nitrogen (N), Phosphorous (P), Potassium (K), temperature,
+            humidity, pH, and rainfall into an instant crop recommendation. It's built
+            for farmers choosing what to plant, researchers studying crop-environment
+            interactions, and policymakers shaping evidence based agricultural strategy.
+          </p>
+        </div>
+        <div class="about-hero__media">
+          <img src="{{ url_for('static', filename='images/farmer_field.png') }}" alt="Farmer in field checking crop health" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <div class="section__head">
+        <div class="section__eyebrow">Model performance</div>
+        <h2>Champion: {{ champion_name }}</h2>
+        <p class="dek">Five classification algorithms were trained and compared on a held-out test split.</p>
+      </div>
+
+      {% if metrics %}
+      <table class="metrics-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th class="mono">Accuracy</th>
+            <th class="mono">Precision</th>
+            <th class="mono">Recall</th>
+            <th class="mono">F1-Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for name, m in metrics.items() %}
+          <tr class="{{ 'champion' if name == champion_name else '' }}">
+            <td>{{ name }}{% if name == champion_name %} · Champion{% endif %}</td>
+            <td class="mono">{{ "%.2f"|format(m.accuracy * 100) }}%</td>
+            <td class="mono">{{ "%.2f"|format(m.precision * 100) }}%</td>
+            <td class="mono">{{ "%.2f"|format(m.recall * 100) }}%</td>
+            <td class="mono">{{ "%.4f"|format(m.f1_score) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="dek">Run <code>python model_training.py</code> to generate comparison metrics.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="section section--tight" style="background: var(--paper-raised); border-top:1px solid var(--paper-line); border-bottom:1px solid var(--paper-line);">
+    <div class="container">
+      <div class="section__head">
+        <div class="section__eyebrow">Signals analyzed</div>
+        <h2>Seven readings, one recommendation</h2>
+      </div>
+      <div class="card-grid" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="seed-card"><h3>N</h3><p>Nitrogen content in soil (kg/ha)</p></div>
+        <div class="seed-card"><h3>P</h3><p>Phosphorous content in soil (kg/ha)</p></div>
+        <div class="seed-card"><h3>K</h3><p>Potassium content in soil (kg/ha)</p></div>
+        <div class="seed-card"><h3>°C</h3><p>Ambient temperature</p></div>
+        <div class="seed-card"><h3>RH%</h3><p>Relative humidity</p></div>
+        <div class="seed-card"><h3>pH</h3><p>Soil pH value</p></div>
+        <div class="seed-card"><h3>mm</h3><p>Rainfall</p></div>
+        <div class="seed-card"><h3>🌾</h3><p>→ Recommended crop, from 22 classes</p></div>
+      </div>
+    </div>
+  </section>
+
+  {% include "_footer.html" %}
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OptiCrop — Smart Agricultural Production Optimization Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  {% include "_nav.html" %}
+
+  <section class="hero">
+    <img class="hero__contours" src="{{ url_for('static', filename='images/contours.svg') }}" alt="" />
+    <div class="hero__inner">
+      <div>
+        <span class="eyebrow">● 7 signals, 22 crops, one reading</span>
+        <h1>Read the soil.<br>Grow the <em>right</em> crop.</h1>
+        <p class="lede">OptiCrop turns Nitrogen, Phosphorous, Potassium, temperature, humidity, pH, and rainfall readings into an instant, data-driven crop recommendation — built for farmers, researchers, and policymakers alike.</p>
+        <div class="hero__ctas">
+          <a href="{{ url_for('findyourcrop') }}" class="btn btn--primary">Find Your Crop →</a>
+          <a href="{{ url_for('about') }}" class="btn btn--ghost">How it works</a>
+        </div>
+      </div>
+
+      <div class="soil-card">
+        <div class="soil-card__label">Sample soil reading</div>
+        <div class="soil-layers">
+          <div class="soil-layer">
+            <span class="k">Nitrogen</span>
+            <span class="bar-track"><span class="bar-fill bar-fill--n" style="width: 64%"></span></span>
+            <span class="v">90</span>
+          </div>
+          <div class="soil-layer">
+            <span class="k">Phosphorous</span>
+            <span class="bar-track"><span class="bar-fill bar-fill--p" style="width: 40%"></span></span>
+            <span class="v">42</span>
+          </div>
+          <div class="soil-layer">
+            <span class="k">Potassium</span>
+            <span class="bar-track"><span class="bar-fill bar-fill--k" style="width: 21%"></span></span>
+            <span class="v">43</span>
+          </div>
+          <div class="soil-layer">
+            <span class="k">Rainfall</span>
+            <span class="bar-track"><span class="bar-fill bar-fill--n" style="width: 68%"></span></span>
+            <span class="v">203mm</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stat-strip">
+    <div class="container stat-strip__inner">
+      <div class="stat"><span class="num">22</span><span class="label">crop classes recognized</span></div>
+      <div class="stat"><span class="num">7</span><span class="label">soil &amp; climate signals per reading</span></div>
+      <div class="stat"><span class="num">99.5%</span><span class="label">held-out test accuracy</span></div>
+      <div class="stat"><span class="num">&lt;1s</span><span class="label">to a recommendation</span></div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__head">
+        <div class="section__eyebrow">Who it's for</div>
+        <h2>One engine, three ways to use it</h2>
+        <p class="dek">OptiCrop was built to serve everyone who has a stake in what gets planted, and why.</p>
+      </div>
+      <div class="card-grid">
+        <div class="seed-card">
+          <span class="seed-card__tag">Scenario 01</span>
+          <h3>Smart crop recommendation for farmers</h3>
+          <p>Enter Nitrogen, Phosphorous, Potassium, temperature, humidity, pH, and rainfall. OptiCrop analyzes the reading and recommends the crop most likely to maximize yield and farming efficiency.</p>
+        </div>
+        <div class="seed-card">
+          <span class="seed-card__tag">Scenario 02</span>
+          <h3>Crop suitability &amp; environmental assessment</h3>
+          <p>Curious whether your land suits a particular crop? OptiCrop evaluates your conditions and reports on compatibility, environmental suitability, and productivity potential.</p>
+        </div>
+        <div class="seed-card">
+          <span class="seed-card__tag">Scenario 03</span>
+          <h3>Agricultural research &amp; policy planning</h3>
+          <p>Researchers and policymakers use OptiCrop to study crop-environment relationships and identify patterns that inform sustainable, evidence-based farming strategy.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight" style="background: var(--paper-raised); border-top: 1px solid var(--paper-line); border-bottom: 1px solid var(--paper-line);">
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;">
+      <div>
+        <h2 style="margin-bottom:6px;">Ready to test a reading?</h2>
+        <p class="dek">Takes seven numbers and a few seconds.</p>
+      </div>
+      <a href="{{ url_for('findyourcrop') }}" class="btn btn--wheat">Find Your Crop →</a>
+    </div>
+  </section>
+
+  {% include "_footer.html" %}
+</body>
+</html>

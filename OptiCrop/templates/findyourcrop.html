@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Find Your Crop — OptiCrop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  {% include "_nav.html" %}
+
+  <section class="section" style="padding-top:48px;">
+    <div class="container">
+      <div class="section__head">
+        <div class="section__eyebrow">Soil test sheet</div>
+        <h2>Find your crop</h2>
+        <p class="dek">Enter a single soil &amp; climate reading below. The panel on the right updates live as you type.</p>
+      </div>
+
+      <div class="finder">
+        <form class="finder-form" method="POST" action="{{ url_for('findyourcrop') }}">
+          <div class="finder-form__title">Soil &amp; climate reading</div>
+          <p class="finder-form__sub">All seven fields are required for a recommendation.</p>
+
+          <div class="field-grid">
+            {% for f in fields %}
+            <div class="field">
+              <label for="{{ f.key }}">{{ f.label }} <span class="unit">{{ f.unit }}</span></label>
+              <input
+                type="number"
+                id="{{ f.key }}"
+                name="{{ f.key }}"
+                step="{{ f.step }}"
+                min="{{ f.min }}"
+                max="{{ f.max }}"
+                placeholder="{{ f.placeholder }}"
+                value="{{ values.get(f.key, '') }}"
+                required
+              />
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="finder-form__submit">
+            <button type="submit" class="btn btn--primary">Evaluate Reading →</button>
+          </div>
+        </form>
+
+        <aside class="profile-panel">
+          <div class="profile-panel__title">Live soil profile</div>
+          <div class="profile-strip">
+            <div class="profile-band profile-band--n" id="band-n"><span id="band-n-value">--</span></div>
+            <div class="profile-band profile-band--p" id="band-p"><span id="band-p-value">--</span></div>
+            <div class="profile-band profile-band--k" id="band-k"><span id="band-k-value">--</span></div>
+          </div>
+          <div class="profile-legend">
+            <div class="row"><span class="dot" style="background:var(--leaf)"></span> Nitrogen (N)</div>
+            <div class="row"><span class="dot" style="background:var(--wheat)"></span> Phosphorous (P)</div>
+            <div class="row"><span class="dot" style="background:var(--clay)"></span> Potassium (K)</div>
+          </div>
+        </aside>
+      </div>
+
+      {% if result %}
+        {% if result.error %}
+        <div class="result-panel error">
+          <strong>{{ result.error }}</strong>
+        </div>
+        {% else %}
+        {% set circumference = 251.2 %}
+        {% set offset = circumference - (result.confidence / 100 * circumference) %}
+        <div class="result-panel">
+          <div class="result-emoji">{{ result.emoji }}</div>
+          <div class="result-body">
+            <div class="result-body__tag">{{ result.category }} · Recommended</div>
+            <h3>{{ result.crop }}</h3>
+            <p>{{ result.note }}</p>
+          </div>
+          <div class="confidence-gauge">
+            <svg viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="var(--paper-line)" stroke-width="9"/>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="var(--leaf)" stroke-width="9"
+                      stroke-linecap="round"
+                      stroke-dasharray="{{ circumference }}"
+                      stroke-dashoffset="{{ offset }}"
+                      transform="rotate(-90 50 50)"/>
+              <text x="50" y="56" text-anchor="middle" class="value">{{ result.confidence | round(0, 'floor') | int }}%</text>
+            </svg>
+            <div class="caption">Confidence</div>
+          </div>
+        </div>
+
+        <!-- Rich Crop Metadata Section -->
+        <div class="crop-details-section">
+          <div class="crop-details-grid">
+            <div class="crop-detail-card">
+              <div class="crop-detail-card__label">Planting Season</div>
+              <div class="crop-detail-card__value">{{ result.info.season }}</div>
+            </div>
+            <div class="crop-detail-card">
+              <div class="crop-detail-card__label">Recommended Soil</div>
+              <div class="crop-detail-card__value">{{ result.info.soil_type }}</div>
+            </div>
+            <div class="crop-detail-card">
+              <div class="crop-detail-card__label">Growing Period</div>
+              <div class="crop-detail-card__value">{{ result.info.growing_period }}</div>
+            </div>
+            <div class="crop-detail-card">
+              <div class="crop-detail-card__label">Water Demand</div>
+              <div class="crop-detail-card__value">{{ result.info.water_requirement }}</div>
+            </div>
+          </div>
+          
+          <div class="crop-detail-card" style="margin-top:-8px; margin-bottom:24px;">
+            <div class="crop-detail-card__label">Key Agricultural / Economic Benefit</div>
+            <div class="crop-detail-card__value" style="color:var(--leaf-dark); font-size:1.05rem;">{{ result.info.key_benefits }}</div>
+          </div>
+        </div>
+
+        <!-- Range Comparison Section -->
+        <div class="range-comparison">
+          <h4 class="range-comparison__title">Optimal Environment Fit Analysis</h4>
+          <p style="margin-top:-8px; margin-bottom:20px; font-size:0.9rem; color:var(--ink-soft);">
+            The green highlighted bands represent the optimal ranges for growing <strong>{{ result.crop }}</strong>. The brown pointer shows your input soil/climate values.
+          </p>
+          <div class="range-bars">
+            {% for r in result.ranges %}
+            <div class="range-row">
+              <div class="range-row__label">
+                {{ r.label }}
+                <span class="unit">{{ r.unit }}</span>
+              </div>
+              <div class="range-slider-wrapper">
+                <div class="range-slider-container">
+                  <div class="range-slider-optimal" style="left: {{ r.opt_left_pct }}%; width: {{ r.opt_width_pct }}%;"></div>
+                  <div class="range-slider-pointer" style="left: {{ r.user_pct }}%;"></div>
+                </div>
+              </div>
+              <div class="range-row__value">
+                <span class="range-status-badge range-status-badge--{{ r.status }}">{{ r.status }}</span>
+                <span class="range-numeric-range">User: {{ r.user_val }} (Opt: {{ r.opt_min }} - {{ r.opt_max }})</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Alternative Crop Recommendation -->
+        {% if result.alternative %}
+        <div class="alternative-panel">
+          <div class="alternative-header">
+            <span class="alternative-badge">Low Confidence Guard</span>
+            <h4>High-Confidence Alternative Recommendation</h4>
+          </div>
+          
+          {% if result.alternative.type == "same_conditions" %}
+          <p style="margin-top:-8px; margin-bottom:20px; font-size:0.94rem; color:var(--ink-soft);">
+            Because the primary recommendation's confidence is less than 70%, the system evaluated secondary models. Under the <strong>exact same conditions</strong>, the <strong>{{ result.alternative.model_name }}</strong> model recommends the following crop with high confidence:
+          </p>
+          {% else %}
+          <p style="margin-top:-8px; margin-bottom:20px; font-size:0.94rem; color:var(--ink-soft);">
+            Because the primary recommendation's confidence is less than 70%, we analyzed how minor soil adjustments can yield highly viable results. Under the same climate, if you adjust your soil properties to the targets below, the model predicts this crop with high confidence:
+          </p>
+          {% endif %}
+          
+          <div class="alternative-layout">
+            <div class="result-emoji" style="border-color:var(--wheat);">{{ result.alternative.emoji }}</div>
+            <div class="result-body">
+              <div class="result-body__tag" style="color:var(--wheat);">{{ result.alternative.category }} · Alternative</div>
+              <h3>{{ result.alternative.crop }}</h3>
+              <p>{{ result.alternative.note }}</p>
+              
+              {% if result.alternative.type == "adjusted_soil" %}
+              <div style="margin-top: 14px; font-family: var(--font-mono); font-size: 0.82rem; color: var(--ink-soft);">
+                Target adjustments: 
+                <span style="background: rgba(201, 154, 62, 0.12); padding: 2px 6px; border-radius: 4px; color: var(--ink); margin-right: 6px;">N: <strong>{{ result.alternative.specs.N }}</strong></span>
+                <span style="background: rgba(201, 154, 62, 0.12); padding: 2px 6px; border-radius: 4px; color: var(--ink); margin-right: 6px;">P: <strong>{{ result.alternative.specs.P }}</strong></span>
+                <span style="background: rgba(201, 154, 62, 0.12); padding: 2px 6px; border-radius: 4px; color: var(--ink); margin-right: 6px;">K: <strong>{{ result.alternative.specs.K }}</strong></span>
+                <span style="background: rgba(201, 154, 62, 0.12); padding: 2px 6px; border-radius: 4px; color: var(--ink);">pH: <strong>{{ result.alternative.specs.ph }}</strong></span>
+              </div>
+              {% endif %}
+            </div>
+            
+            {% set alt_circumference = 251.2 %}
+            {% set alt_offset = alt_circumference - (result.alternative.confidence / 100 * alt_circumference) %}
+            <div class="confidence-gauge">
+              <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="var(--paper-line)" stroke-width="9"/>
+                <circle cx="50" cy="50" r="40" fill="none" stroke="var(--wheat)" stroke-width="9"
+                        stroke-linecap="round"
+                        stroke-dasharray="{{ alt_circumference }}"
+                        stroke-dashoffset="{{ alt_offset }}"
+                        transform="rotate(-90 50 50)"/>
+                <text x="50" y="56" text-anchor="middle" class="value">{{ result.alternative.confidence | round(0, 'floor') | int }}%</text>
+              </svg>
+              <div class="caption" style="color:var(--wheat);">Confidence</div>
+            </div>
+          </div>
+          
+          <!-- Alternative Info details -->
+          <div class="crop-details-grid" style="margin-top:24px; margin-bottom:0;">
+            <div class="crop-detail-card" style="background:#fff;">
+              <div class="crop-detail-card__label">Planting Season</div>
+              <div class="crop-detail-card__value">{{ result.alternative.info.season }}</div>
+            </div>
+            <div class="crop-detail-card" style="background:#fff;">
+              <div class="crop-detail-card__label">Recommended Soil</div>
+              <div class="crop-detail-card__value">{{ result.alternative.info.soil_type }}</div>
+            </div>
+            <div class="crop-detail-card" style="background:#fff;">
+              <div class="crop-detail-card__label">Growing Period</div>
+              <div class="crop-detail-card__value">{{ result.alternative.info.growing_period }}</div>
+            </div>
+            <div class="crop-detail-card" style="background:#fff;">
+              <div class="crop-detail-card__label">Water Demand</div>
+              <div class="crop-detail-card__value">{{ result.alternative.info.water_requirement }}</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% endif %}
+      {% endif %}
+    </div>
+  </section>
+
+  {% include "_footer.html" %}
+  <script src="{{ url_for('static', filename='js/soilprofile.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "Logistic Regression": {
+    "accuracy": 0.9727,
+    "precision": 0.974,
+    "recall": 0.9727,
+    "f1_score": 0.9725
+  },
+  "Decision Tree": {
+    "accuracy": 0.9795,
+    "precision": 0.9806,
+    "recall": 0.9795,
+    "f1_score": 0.9794
+  },
+  "Random Forest": {
+    "accuracy": 0.9955,
+    "precision": 0.9957,
+    "recall": 0.9955,
+    "f1_score": 0.9955
+  },
+  "Naive Bayes": {
+    "accuracy": 0.9955,
+    "precision": 0.9959,
+    "recall": 0.9955,
+    "f1_score": 0.9954
+  },
+  "SVM (RBF)": {
+    "accuracy": 0.9841,
+    "precision": 0.9856,
+    "recall": 0.9841,
+    "f1_score": 0.984
+  }
+}

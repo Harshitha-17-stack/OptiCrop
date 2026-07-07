@@ -1,0 +1,13 @@
+<nav class="nav">
+  <div class="nav__inner">
+    <a href="{{ url_for('home') }}" class="nav__brand">
+      <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="" />
+      OptiCrop
+    </a>
+    <ul class="nav__links">
+      <li><a href="{{ url_for('home') }}" class="{{ 'active' if active_page == 'home' else '' }}">Home</a></li>
+      <li><a href="{{ url_for('about') }}" class="{{ 'active' if active_page == 'about' else '' }}">About</a></li>
+      <li><a href="{{ url_for('findyourcrop') }}" class="{{ 'active' if active_page == 'findyourcrop' else '' }}">Find Your Crop</a></li>
+    </ul>
+  </div>
+</nav>
